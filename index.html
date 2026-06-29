@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تطبيق FluxChain للتداول</title>
+    
+    <!-- استدعاء Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- استدعاء أيقونات Phosphor -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- تنسيقات مخصصة لإخفاء شريط التمرير -->
+    <style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Tajawal', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-950 min-h-screen flex items-center justify-center p-4 text-white overflow-hidden">
+
+    <!-- حاوية الهاتف -->
+    <div class="relative w-full max-w-[400px] h-[850px] bg-[#0A0D20] sm:border-[8px] border-gray-900 sm:rounded-[3rem] overflow-hidden shadow-2xl">
+        
+        <!-- شريط الحالة (وهمي) -->
+        <div class="absolute top-0 inset-x-0 h-12 z-50 flex justify-between items-center px-6 text-xs font-medium pointer-events-none text-white">
+            <span>9:41</span>
+            <div class="flex gap-2 items-center">
+                <div class="flex space-x-1 space-x-reverse items-end h-3">
+                    <div class="w-1 h-1.5 bg-white rounded-sm"></div>
+                    <div class="w-1 h-2 bg-white rounded-sm"></div>
+                    <div class="w-1 h-2.5 bg-white rounded-sm"></div>
+                    <div class="w-1 h-3 bg-white rounded-sm"></div>
+                </div>
+                <div class="w-4 h-3 rounded-full border-[1.5px] border-white relative overflow-hidden">
+                    <div class="absolute bottom-0 inset-x-0 h-2 bg-white rounded-b-full"></div>
+                </div>
+                <div class="w-6 h-3 bg-transparent rounded-sm border border-white/50 relative">
+                    <div class="absolute inset-y-0.5 right-0.5 left-1.5 bg-white rounded-sm"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="absolute top-2 left-1/2 transform -translate-x-1/2 w-32 h-7 bg-black rounded-full z-50"></div>
+
+        <!-- إضاءة خلفية -->
+        <div class="absolute top-[-10%] right-[-10%] w-[350px] h-[350px] bg-blue-600/20 rounded-full blur-[100px] pointer-events-none"></div>
+        <div class="absolute bottom-[20%] left-[-10%] w-[300px] h-[300px] bg-purple-600/15 rounded-full blur-[100px] pointer-events-none"></div>
+
+        <!-- 1. شاشة إنشاء الحساب -->
+        <div id="signup-screen" class="flex flex-col h-full px-6 pt-12 pb-8 relative z-10 transition-opacity duration-300">
+            <div class="flex flex-col items-center mt-4">
+                <div class="flex items-center gap-2 mb-8">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center p-1">
+                        <i class="ph-bold ph-shield-check text-white text-xl"></i>
+                    </div>
+                    <span class="text-xl font-bold tracking-wide">FluxChain</span>
+                </div>
+                
+                <div class="inline-flex items-center gap-2 bg-[#ffffff10] px-4 py-1.5 rounded-full border border-white/5 mb-6 backdrop-blur-md">
+                    <div class="w-2 h-2 rounded-full bg-purple-400 shadow-[0_0_8px_#a855f7]"></div>
+                    <span class="text-xs text-gray-300">تداول العملات المشفرة في أي وقت</span>
+                </div>
+
+                <h1 class="text-3xl font-bold text-center leading-tight mb-2">
+                    عزز رحلتك<br />في عالم التشفير
+                </h1>
+                <p class="text-gray-400 text-sm text-center mb-10">تمكين مستقبل التمويل</p>
+            </div>
+
+            <div class="relative h-48 w-full flex items-center justify-center mb-12">
+                <div class="absolute w-40 h-40 bg-purple-600/30 rounded-full blur-3xl"></div>
+                <div class="absolute w-32 h-32 bg-blue-500/20 rounded-full blur-2xl -translate-x-12"></div>
+                
+                <div class="absolute z-20 transform rotate-12 translate-x-8 -translate-y-4">
+                    <div class="w-20 h-24 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+                        <div class="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center text-white font-bold text-xl shadow-[0_0_15px_#f97316]">₿</div>
+                    </div>
+                </div>
+
+                <div class="absolute z-10 transform -rotate-6 -translate-x-8 translate-y-4">
+                    <div class="w-20 h-24 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl flex items-center justify-center shadow-lg">
+                        <div class="w-10 h-10 rounded-full bg-teal-400/20 flex items-center justify-center text-teal-400 font-bold text-xl border border-teal-400/50">⬡</div>
+                    </div>
+                </div>
+                
+                <div class="absolute w-64 h-24 border border-white/20 rounded-full transform rotate-12 -z-10"></div>
+            </div>
+
+            <div class="mt-auto bg-[#131835]/80 backdrop-blur-xl p-6 rounded-[2rem] border border-white/5 shadow-2xl">
+                <p class="text-center text-sm mb-4">ليس لديك حساب بعد؟</p>
+                
+                <div class="flex gap-3 mb-4">
+                    <div class="flex items-center justify-center gap-1 bg-[#ffffff0a] border border-white/10 rounded-xl px-3 py-3 w-1/3">
+                        <span>🇺🇸</span>
+                        <span class="text-sm">+1</span>
+                        <i class="ph-bold ph-caret-down text-gray-400 text-xs"></i>
+                    </div>
+                    <div class="flex-1 bg-[#ffffff0a] border border-white/10 rounded-xl px-4 py-3 flex items-center">
+                        <input type="text" placeholder="258-874-9373" class="bg-transparent w-full text-sm outline-none text-white placeholder-gray-500 text-left" dir="ltr" />
+                    </div>
+                </div>
+
+                <button onclick="navigate('home')" class="w-full bg-gradient-to-r from-[#7B3FE4] to-[#A05CFF] text-white font-semibold py-4 rounded-xl mb-4 shadow-[0_0_20px_rgba(139,92,246,0.3)] transition-transform active:scale-95">
+                    إنشاء حساب
+                </button>
+                
+                <p class="text-center text-xs text-gray-400">
+                    لديك حساب بالفعل؟ <span class="text-purple-400 font-medium cursor-pointer">تسجيل الدخول</span>
+                </p>
+            </div>
+        </div>
+
+        <!-- 2. الشاشة الرئيسية -->
+        <div id="home-screen" class="hidden flex-col h-full overflow-y-auto pb-24 relative z-10 no-scrollbar transition-opacity duration-300">
+            <div class="px-6 pt-14 pb-6 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full overflow-hidden bg-gray-700 border-2 border-[#ffffff10]">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Ryan" alt="المستخدم" class="w-full h-full object-cover" />
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400">صباح الخير!</p>
+                        <p class="font-semibold text-sm">ريان ستيرلينج</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button class="w-9 h-9 rounded-full bg-[#ffffff0a] flex items-center justify-center border border-white/5">
+                        <i class="ph ph-scan text-gray-300 text-lg"></i>
+                    </button>
+                    <button class="w-9 h-9 rounded-full bg-[#ffffff0a] flex items-center justify-center relative border border-white/5">
+                        <i class="ph ph-bell text-gray-300 text-lg"></i>
+                        <div class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-[#0A0D20]"></div>
+                    </button>
+                </div>
+            </div>
+
+            <div class="px-6 mb-6">
+                <div class="flex items-center justify-between mb-1">
+                    <span class="text-gray-400 text-sm">إجمالي الرصيد</span>
+                    <button onclick="toggleBalance()">
+                        <i id="balance-icon" class="ph ph-eye text-gray-500 text-lg"></i>
+                    </button>
+                </div>
+                <div class="text-[2.5rem] font-bold tracking-tight mb-2 flex items-center gap-1" dir="ltr">
+                    <span class="text-2xl text-gray-400 mt-2">$</span>
+                    <span id="balance-amount">32,680.20</span>
+                </div>
+                <div class="flex items-center gap-2 text-sm">
+                    <span class="text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded flex items-center gap-1" dir="ltr">
+                        +16.16%
+                    </span>
+                    <span class="text-gray-400" dir="ltr">+$5,280.00</span>
+                </div>
+            </div>
+
+            <div class="px-6 mb-8">
+                <div class="flex gap-3 mb-4 overflow-x-auto no-scrollbar snap-x">
+                    <div class="min-w-[140px] h-16 rounded-2xl bg-gradient-to-r from-blue-600 to-blue-400 flex items-center justify-between px-4 relative overflow-hidden snap-start shadow-lg shadow-blue-900/20">
+                        <span class="font-medium text-sm z-10">المحفظة ١</span>
+                        <span class="text-xs text-blue-100 bg-black/20 px-2 py-1 rounded-lg z-10" dir="ltr">0x3F...C21</span>
+                    </div>
+                    <div class="min-w-[140px] h-16 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-500 flex items-center justify-between px-4 relative overflow-hidden snap-start">
+                        <span class="font-medium text-sm z-10">المحفظة ٢</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <button class="flex-1 bg-[#ffffff0c] border border-white/5 hover:bg-[#ffffff15] py-3.5 rounded-xl flex items-center justify-center gap-2 text-sm font-medium transition-colors">
+                        <i class="ph-bold ph-arrow-down-left text-lg"></i> استلام
+                    </button>
+                    <button class="flex-1 bg-gradient-to-r from-[#7B3FE4] to-[#A05CFF] shadow-[0_0_15px_rgba(139,92,246,0.3)] py-3.5 rounded-xl flex items-center justify-center gap-2 text-sm font-medium transition-colors">
+                        <i class="ph-bold ph-arrow-up-right text-lg"></i> تحويل
+                    </button>
+                    <button class="w-14 bg-[#ffffff0c] border border-white/5 py-3.5 rounded-xl flex items-center justify-center transition-colors">
+                        <i class="ph-bold ph-dots-three text-gray-400 text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="px-6 bg-[#131835]/50 flex-1 rounded-t-[2.5rem] pt-6 border-t border-white/5 backdrop-blur-md">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-lg font-semibold">أموالي</h2>
+                    <span class="text-xs text-gray-400 cursor-pointer">عرض الكل</span>
+                </div>
+
+                <div class="flex items-center gap-6 text-sm text-gray-500 mb-6">
+                    <span class="text-white bg-[#ffffff10] px-3 py-1 rounded-full border border-white/10">المفضلة</span>
+                    <span>الأعلى</span>
+                    <span>الجديد</span>
+                    <span>الرابحون</span>
+                </div>
+
+                <div class="flex flex-col gap-3">
+                    <div class="bg-[#ffffff08] border border-white/5 p-4 rounded-2xl flex items-center justify-between hover:bg-[#ffffff0d] transition-colors">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-[#627EEA]/20 flex items-center justify-center">
+                                <span class="text-[#627EEA] font-bold text-lg">⬡</span>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-sm">ETH <span class="text-xs text-gray-500 font-normal ml-1">Ethereum</span></p>
+                                <p class="text-sm font-medium mt-0.5" dir="ltr">$2,680.26</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-end gap-1">
+                            <span class="text-xs text-emerald-400 flex items-center gap-0.5" dir="ltr">
+                                <i class="ph-bold ph-arrow-up-right"></i> 2.64%
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="bg-[#ffffff08] border border-white/5 p-4 rounded-2xl flex items-center justify-between hover:bg-[#ffffff0d] transition-colors">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-[#F7931A]/20 flex items-center justify-center">
+                                <span class="text-[#F7931A] font-bold text-lg">₿</span>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-sm">BTC <span class="text-xs text-gray-500 font-normal ml-1">Bitcoin</span></p>
+                                <p class="text-sm font-medium mt-0.5" dir="ltr">$96,012.98</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-end gap-1">
+                            <span class="text-xs text-red-400 flex items-center gap-0.5" dir="ltr">
+                                <i class="ph-bold ph-arrow-down-left"></i> 1.24%
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. شاشة التحويل -->
+        <div id="exchange-screen" class="hidden flex-col h-full overflow-y-auto pb-24 relative z-10 no-scrollbar transition-opacity duration-300">
+            <div class="px-6 pt-14 pb-6 flex items-center justify-between">
+                <button onclick="navigate('home')" class="w-10 h-10 bg-[#ffffff0a] rounded-full flex items-center justify-center border border-white/5 hover:bg-white/10 transition">
+                    <i class="ph-bold ph-arrow-right text-lg"></i>
+                </button>
+                <span class="font-semibold text-lg">تحويل العملات</span>
+                <button class="w-10 h-10 bg-[#ffffff0a] rounded-full flex items-center justify-center border border-white/5">
+                    <i class="ph ph-info text-gray-300 text-xl"></i>
+                </button>
+            </div>
+
+            <div class="px-6 flex-1 flex flex-col">
+                <div class="bg-[#131835]/80 backdrop-blur-xl border border-white/5 rounded-[2rem] p-2 relative shadow-2xl mb-8">
+                    
+                    <div class="bg-[#ffffff08] rounded-3xl p-5 mb-1">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-xs text-gray-400">من (المرسل)</span>
+                            <div class="flex items-center gap-2 text-gray-400">
+                                <i class="ph ph-wallet"></i>
+                                <span class="text-xs bg-[#ffffff10] px-2 py-0.5 rounded-md">المحفظة ١</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-1 bg-[#ffffff10] border border-white/10 px-3 py-1.5 rounded-full cursor-pointer hover:bg-[#ffffff1a] transition-colors">
+                                <div class="w-5 h-5 rounded-full bg-black flex items-center justify-center text-teal-400 text-xs font-bold">S</div>
+                                <span class="font-medium text-sm ml-1" dir="ltr">SOL</span>
+                                <i class="ph-bold ph-caret-down text-gray-400 text-xs"></i>
+                            </div>
+                            <input type="text" value="2.5" readonly dir="ltr" class="bg-transparent text-right text-3xl font-bold w-1/2 outline-none text-white" />
+                        </div>
+                        
+                        <div class="flex items-center justify-between text-xs text-gray-500">
+                            <span>الرصيد: <span class="text-gray-300" dir="ltr">32.874 SOL</span></span>
+                            <span dir="ltr">≈ $250.00 (USD)</span>
+                        </div>
+                    </div>
+
+                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-[#1b2142] border-[4px] border-[#131835] rounded-full flex items-center justify-center cursor-pointer hover:scale-105 transition-transform">
+                        <i class="ph-bold ph-arrows-left-right text-gray-300 text-lg transform rotate-90"></i>
+                    </div>
+
+                    <div class="bg-[#ffffff08] rounded-3xl p-5 pt-7">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-xs text-gray-400">إلى (المستلم)</span>
+                            <div class="flex items-center gap-1 text-xs text-gray-400">
+                                <span>رسوم التحويل</span>
+                                <i class="ph ph-info"></i>
+                                <span class="text-gray-300 ml-1" dir="ltr">0.50 DOGE</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-1 bg-[#ffffff10] border border-white/10 px-3 py-1.5 rounded-full cursor-pointer hover:bg-[#ffffff1a] transition-colors">
+                                <div class="w-5 h-5 rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-500 text-xs font-bold">Ð</div>
+                                <span class="font-medium text-sm ml-1" dir="ltr">DOGE</span>
+                                <i class="ph-bold ph-caret-down text-gray-400 text-xs"></i>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between mt-2">
+                            <div class="flex flex-col">
+                                <span class="text-xs text-gray-500 mb-0.5">المبلغ</span>
+                                <span class="text-2xl font-bold" dir="ltr">3,200 <span class="text-lg font-normal text-gray-400">DOGE</span></span>
+                            </div>
+                            <button class="bg-gradient-to-r from-[#7B3FE4] to-[#A05CFF] shadow-[0_0_15px_rgba(139,92,246,0.4)] px-8 py-3 rounded-xl font-semibold flex items-center gap-2 text-sm transition-transform active:scale-95">
+                                <i class="ph-bold ph-arrows-left-right"></i> تبديل
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-sm">التحويلات الأخيرة</h3>
+                        <span class="text-xs text-gray-400 cursor-pointer">عرض الكل</span>
+                    </div>
+                    
+                    <div class="flex flex-col gap-3">
+                        <div class="bg-[#ffffff08] border border-white/5 p-3.5 rounded-2xl flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="relative flex">
+                                    <div class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-xs z-10 border-2 border-[#131835]">₿</div>
+                                    <div class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-xs -mr-3 border-2 border-[#131835] font-bold">A</div>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium" dir="ltr">ADA to BTC</p>
+                                    <p class="text-[10px] text-gray-500" dir="ltr">12 Feb, 02:00 PM</p>
+                                </div>
+                            </div>
+                            <span class="text-emerald-400 text-sm font-medium" dir="ltr">+0.0024 BTC</span>
+                        </div>
+
+                        <div class="bg-[#ffffff08] border border-white/5 p-3.5 rounded-2xl flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="relative flex">
+                                    <div class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-xs z-10 border-2 border-[#131835]">≡</div>
+                                    <div class="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-gray-300 text-xs -mr-3 border-2 border-[#131835]">∞</div>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium" dir="ltr">SOL to ETH</p>
+                                    <p class="text-[10px] text-gray-500" dir="ltr">12 Feb, 02:00 PM</p>
+                                </div>
+                            </div>
+                            <span class="text-emerald-400 text-sm font-medium" dir="ltr">+0.005 ETH</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- شريط التنقل السفلي -->
+        <div id="bottom-nav" class="hidden absolute bottom-6 inset-x-6 z-50">
+            <div class="bg-[#151932]/90 backdrop-blur-xl border border-white/5 rounded-3xl h-16 px-6 flex items-center justify-between shadow-lg">
+                <button onclick="navigate('home')" id="nav-home" class="p-2 transition-colors text-white">
+                    <i class="ph-fill ph-house text-2xl"></i>
+                </button>
+                
+                <button class="p-2 text-gray-500 hover:text-gray-300 transition-colors">
+                    <i class="ph ph-wallet text-2xl"></i>
+                </button>
+                
+                <button onclick="navigate('exchange')" class="w-14 h-14 -mt-6 bg-gradient-to-r from-[#7B3FE4] to-[#A05CFF] rounded-2xl flex items-center justify-center shadow-[0_8px_20px_rgba(139,92,246,0.4)] text-white hover:-translate-y-1 transition-transform">
+                    <i class="ph-bold ph-arrows-left-right text-xl"></i>
+                </button>
+                
+                <button class="p-2 text-gray-500 hover:text-gray-300 transition-colors">
+                    <i class="ph ph-magnifying-glass text-2xl"></i>
+                </button>
+                
+                <button class="p-2 text-gray-500 hover:text-gray-300 transition-colors">
+                    <i class="ph ph-gear text-2xl"></i>
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function navigate(screenName) {
+            document.getElementById('signup-screen').classList.add('hidden');
+            document.getElementById('home-screen').classList.add('hidden');
+            document.getElementById('exchange-screen').classList.add('hidden');
+            
+            const targetScreen = document.getElementById(screenName + '-screen');
+            targetScreen.classList.remove('hidden');
+            targetScreen.classList.add('flex');
+
+            const bottomNav = document.getElementById('bottom-nav');
+            if (screenName === 'signup') {
+                bottomNav.classList.add('hidden');
+            } else {
+                bottomNav.classList.remove('hidden');
+                const navHome = document.getElementById('nav-home');
+                if (screenName === 'home') {
+                    navHome.classList.add('text-white');
+                    navHome.classList.remove('text-gray-500');
+                    navHome.innerHTML = '<i class="ph-fill ph-house text-2xl"></i>';
+                } else {
+                    navHome.classList.remove('text-white');
+                    navHome.classList.add('text-gray-500');
+                    navHome.innerHTML = '<i class="ph ph-house text-2xl"></i>';
+                }
+            }
+        }
+
+        let isBalanceVisible = true;
+        function toggleBalance() {
+            isBalanceVisible = !isBalanceVisible;
+            const balanceAmount = document.getElementById('balance-amount');
+            const balanceIcon = document.getElementById('balance-icon');
+            
+            if (isBalanceVisible) {
+                balanceAmount.innerText = '32,680.20';
+                balanceIcon.className = 'ph ph-eye text-gray-500 text-lg';
+            } else {
+                balanceAmount.innerText = '******';
+                balanceIcon.className = 'ph ph-eye-slash text-gray-500 text-lg';
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+
+
